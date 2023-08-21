@@ -1,0 +1,192 @@
+; /* vim: set fdm=marker ai ts=4 sw=4 fenc=utf-8 : */
+
+(defvar center-image-path "./assets/arch_starfield.svg")
+(defvar show-shortcuts false)
+(defvar show-powermenu false)
+
+(defpoll time-poll :interval "1s" `date +%H:%M`)
+(defpoll date-poll :interval "60s" `date '+%a, %m-%d'`)
+
+; Styled button
+(defwidget main-button [text ?shortcut ?tooltip ?onclick ?onrightclick ?force-show-shortcut]
+    (button
+        :class "main-button"
+        :hexpand true
+        :tooltip tooltip
+        :onclick onclick
+        :onrightclick onrightclick
+        (box
+            :space-evenly false
+            :hexpand true
+            (label
+                :class "text"
+                :halign "start"
+                :hexpand true
+                :xalign 0
+                :text text
+            )
+            (label
+                :class "shortcut"
+                :halign "end"
+                :xalign 1
+                :text shortcut
+                :visible {(force-show-shortcut == true || show-shortcuts) && shortcut != ""}
+            )
+        )
+    )
+)
+
+; Just a box preset
+(defwidget button-row []
+    (box
+        :orientation "h"
+        :hexpand true
+        :space-evenly true
+        (children)
+    )
+)
+
+; The meat and potatoes
+(defwidget middle-row [monitor-id]
+    (box
+        :space-evenly true
+        :orientation "h"
+        :valign "start"
+        (box
+            :class "menu-column"
+            :space-evenly false
+            :vexpand false
+            :valign "center"
+            :orientation "v"
+            (button-row
+                (main-button
+                    :text "Launch"
+                    :onclick "wofi --show drun &"
+                )
+                (main-button
+                    :text time-poll
+                    :shortcut date-poll
+                    :force-show-shortcut true
+                )
+            )
+            (main-button
+                :text "Terminal"
+                :shortcut "  + Enter"
+                :onclick "kitty &"
+            )
+            (main-button
+                :text "Firefox"
+                :onclick "firefox &"
+            )
+            (main-button
+                :text "Dolphin"
+                :shortcut "  + E"
+                :onclick "dolphin &"
+            )
+            (main-button
+                :text "ncspot"
+                :onclick "kitty -e ncspot &"
+            )
+            (button-row
+                (main-button
+                    :text "Steam"
+                    :onclick "steam &"
+                )
+                (main-button
+                    :text "Lutris"
+                    :onclick "lutris &"
+                )
+                (main-button
+                    :text "Heroic"
+                    :onclick "flatpak run com.heroicgameslauncher.hgl &"
+                )
+            )
+            (box
+                :space-evenly false
+                (main-button
+                    :text "Leave..."
+                    :shortcut "  + Esc"
+                    :onclick `${EWW_CMD} update show-powermenu=${!show-powermenu}`
+                )
+                (revealer
+                    :reveal show-powermenu
+                    :transition "slideright"
+                    (button-row
+                        (main-button
+                            :text ""
+                            :tooltip "Lock"
+                        )
+                        (main-button
+                            :text "󰿅"
+                            :tooltip "Exit"
+                            :onclick "hyprctl dispatch exit"
+                        )
+                        (main-button
+                            :text ""
+                            :tooltip "Reboot"
+                            :onclick "systemctl reboot"
+                        )
+                        (main-button
+                            :text "󰐥"
+                            :tooltip "Poweroff"
+                            :onclick "systemctl poweroff"
+                        )
+                    )
+                )
+            )
+        )
+        (image
+            :hexpand false
+            :vexpand true
+            :valign "end"
+            :path center-image-path
+            :image-width 600
+        )
+        (box)
+    )
+)
+
+; Empty for the moment
+(defwidget bottom-row [monitor-id]
+    (box
+        :hexpand true
+        :vexpand true
+    )
+)
+
+; Ditto
+(defwidget top-row [monitor-id]
+    (box
+        :hexpand true
+        :vexpand true
+    )
+)
+
+; Main widget that contains everything
+(defwidget window [monitor-id]
+    (box
+        :orientation "v"
+        :space-evenly true
+        :hexpand true
+        :vexpand true
+        (top-row :monitor-id monitor-id)
+        (middle-row :monitor-id monitor-id)
+        (bottom-row :monitor-id monitor-id)
+    )
+)
+
+; Window for DP-1
+(defwindow main-menu-0
+	:monitor 0
+	:geometry (geometry
+        :x "0%"
+        :y "0%"
+        :width "100%"
+        :height "100%"
+        :anchor "center"
+	)
+	:stacking "bg"
+	:exclusive false
+
+    (window :monitor-id 0)
+)

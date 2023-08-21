@@ -1,0 +1,40 @@
+/* vim: set fdm=marker ai sw=4 ts=4 fenc=utf-8: */
+
+* {
+	all: unset;
+	color: #68a;
+	border: none;
+	font-family: Chakra Petch;
+	font-size: 14px;
+}
+
+.menu-column {
+	padding-left: 160px;
+	padding-right: 240px;
+}
+
+.main-button {
+	* {
+		font-family: Chakra Petch Medium;
+		font-size: 1.4em;
+		color: #f1f1f1;
+	}
+
+	.shortcut {
+		font-size: 1em;
+		color: #888;
+	}
+
+	padding: 4px;
+	padding-left: 24px;
+	padding-right: 24px;
+	margin: 2px;
+	background: #323232;
+}
+
+.main-button:hover {
+	background: #f1f1f1;
+	* {
+		color: #323232;
+	}
+}
